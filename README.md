@@ -1,3 +1,26 @@
+## tsid (noetic) - 1.4.2-1
+
+The packages in the `tsid` repository were released into the `noetic` distro by running `/usr/bin/bloom-release tsid --rosdistro noetic` on `Fri, 27 Nov 2020 10:06:04 -0000`
+
+The `tsid` package was released.
+
+Version of package(s) in repository `tsid`:
+
+- upstream repository: https://github.com/stack-of-tasks/tsid.git
+- release repository: https://github.com/stack-of-tasks/tsid-ros-release.git
+- rosdistro version: `1.4.1-2`
+- old version: `1.4.1-2`
+- new version: `1.4.2-1`
+
+Versions of tools used:
+
+- bloom version: `0.10.0`
+- catkin_pkg version: `0.4.23`
+- rosdep version: `0.20.0`
+- rosdistro version: `0.8.3`
+- vcstools version: `0.1.42`
+
+
 ## tsid (melodic) - 1.4.2-1
 
 The packages in the `tsid` repository were released into the `melodic` distro by running `/usr/bin/bloom-release tsid --rosdistro melodic` on `Fri, 27 Nov 2020 09:56:55 -0000`
