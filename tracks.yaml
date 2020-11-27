@@ -92,11 +92,11 @@ tracks:
     - git-bloom-generate -y rosrpm --prefix release/:{ros_distro} :{ros_distro} -i
       :{release_inc} --os-name rhel
     devel_branch: devel
-    last_release: v1.4.1
-    last_version: 1.4.1
+    last_release: v1.4.2
+    last_version: 1.4.2
     name: tsid
     patches: null
-    release_inc: '2'
+    release_inc: '1'
     release_repo_url: https://github.com/stack-of-tasks/tsid-ros-release.git
     release_tag: v:{version}
     ros_distro: noetic
