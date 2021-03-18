@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2017-2020 CNRS
+# Copyright (c) 2017-2021 CNRS
 #
 # This file is part of tsid
 # tsid is free software: you can redistribute it
@@ -72,10 +72,8 @@ ENDIF(EIGEN_NO_AUTOMATIC_RESIZING)
 CHECK_MINIMAL_CXX_STANDARD(11 ENFORCE)
 
 # Project dependencies
-ADD_PROJECT_DEPENDENCY(pinocchio 2.3.1 REQUIRED
-  PKG_CONFIG_REQUIRES "pinocchio >= 2.3.1")
-ADD_PROJECT_DEPENDENCY(eiquadprog 1.1.3 REQUIRED
-  PKG_CONFIG_REQUIRES "eiquadprog >= 1.1.3")
+ADD_PROJECT_DEPENDENCY(pinocchio 2.3.1 REQUIRED)
+ADD_PROJECT_DEPENDENCY(eiquadprog 1.1.3 REQUIRED)
 
 IF(BUILD_TESTING)
   FIND_PACKAGE(Boost REQUIRED COMPONENTS unit_test_framework)
@@ -84,7 +82,7 @@ ENDIF(BUILD_TESTING)
 IF(BUILD_PYTHON_INTERFACE)
   FINDPYTHON()
   SET(PYWRAP ${PROJECT_NAME}_pywrap)
-  ADD_PROJECT_DEPENDENCY(eigenpy REQUIRED PKG_CONFIG_REQUIRES eigenpy)
+  ADD_PROJECT_DEPENDENCY(eigenpy REQUIRED)
   SEARCH_FOR_BOOST_PYTHON(REQUIRED)
 ENDIF(BUILD_PYTHON_INTERFACE)
 
@@ -107,6 +105,7 @@ SET(${PROJECT_NAME}_TASKS_HEADERS
   include/tsid/tasks/task-com-equality.hpp
   include/tsid/tasks/task-se3-equality.hpp
   include/tsid/tasks/task-contact-force-equality.hpp
+  include/tsid/tasks/task-cop-equality.hpp
   include/tsid/tasks/task-actuation-equality.hpp
   include/tsid/tasks/task-actuation-bounds.hpp
   include/tsid/tasks/task-joint-bounds.hpp
@@ -150,11 +149,13 @@ SET(${PROJECT_NAME}_ROBOTS_HEADERS
   )
 
 SET(${PROJECT_NAME}_FORMULATIONS_HEADERS
+  include/tsid/formulations/contact-level.hpp
   include/tsid/formulations/inverse-dynamics-formulation-base.hpp
   include/tsid/formulations/inverse-dynamics-formulation-acc-force.hpp
   )
 
 FILE(GLOB ${PYWRAP}_HEADERS
+  include/tsid/bindings/python/fwd.hpp
   include/tsid/bindings/python/constraint/*.hpp
   include/tsid/bindings/python/contacts/*.hpp
   include/tsid/bindings/python/formulations/*.hpp
@@ -198,6 +199,7 @@ SET(${PROJECT_NAME}_TASKS_SOURCES
   src/tasks/task-com-equality.cpp
   src/tasks/task-contact-force-equality.cpp
   src/tasks/task-contact-force.cpp
+  src/tasks/task-cop-equality.cpp
   src/tasks/task-joint-bounds.cpp
   src/tasks/task-joint-posture.cpp
   src/tasks/task-joint-posVelAcc-bounds.cpp
@@ -232,6 +234,7 @@ SET(${PROJECT_NAME}_ROBOTS_SOURCES
   )
 
 SET(${PROJECT_NAME}_FORMULATIONS_SOURCES
+  src/formulations/contact-level.cpp
   src/formulations/inverse-dynamics-formulation-base.cpp
   src/formulations/inverse-dynamics-formulation-acc-force.cpp
   )
@@ -272,7 +275,6 @@ IF(BUILD_TESTING)
 ENDIF(BUILD_TESTING)
 
 # --- PACKAGING ----------------------------------------------------------------
-PKG_CONFIG_APPEND_LIBS(${PROJECT_NAME})
 IF(NOT INSTALL_PYTHON_INTERFACE_ONLY)
   INSTALL(FILES package.xml DESTINATION share/${PROJECT_NAME})
 ENDIF(NOT INSTALL_PYTHON_INTERFACE_ONLY)

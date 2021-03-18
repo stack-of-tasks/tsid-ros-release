@@ -19,7 +19,7 @@ q0 = np.array([ 0. , -1.0,  0.7,  0. ,  0. ,  0. ])  # initial configuration
 amp                  = np.array([0.0, 0.0, 0.0])           # amplitude
 phi                  = np.array([0.0, 0.5*np.pi, 0.0])         # phase
 two_pi_f             = 2*np.pi*np.array([1.0, 0.5, 0.5])   # frequency (time 2 PI)
-offset               = np.array([0.2, 0.0, 0.0])
+offset               = np.array([0.1, 0.0, 0.0])
 
 w_ee = 1.0                      # weight of end-effector task
 w_posture = 1e-3                # weight of joint posture task
@@ -34,6 +34,7 @@ v_max_scaling = 0.4             # scaling factor of velocity bounds
 
 ee_frame_name = "ee_fixed_joint"        # end-effector frame name
 ee_task_mask = np.array([1., 1, 1, 0, 0, 0])
+ee_task_local_frame = False      # specifies whether task is formulated in local frame
 
 PRINT_N = 500                   # print every PRINT_N time steps
 DISPLAY_N = 20                  # update robot configuration in viwewer every DISPLAY_N time steps

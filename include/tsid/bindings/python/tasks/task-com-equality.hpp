@@ -18,11 +18,7 @@
 #ifndef __tsid_python_task_com_hpp__
 #define __tsid_python_task_com_hpp__
 
-#include <pinocchio/fwd.hpp>
-#include <boost/python.hpp>
-#include <string>
-#include <eigenpy/eigenpy.hpp>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
+#include "tsid/bindings/python/fwd.hpp"
 
 #include "tsid/tasks/task-com-equality.hpp"
 #include "tsid/robots/robot-wrapper.hpp"
@@ -64,6 +60,8 @@ namespace tsid
         .def("compute", &TaskCOMEqualityPythonVisitor::compute, bp::args("t", "q", "v", "data"))
         .def("getConstraint",  &TaskCOMEqualityPythonVisitor::getConstraint)
         .add_property("name", &TaskCOMEqualityPythonVisitor::name)
+        .add_property("mask", bp::make_function(&TaskCOMEqualityPythonVisitor::getmask, bp::return_value_policy<bp::copy_const_reference>()), "Return mask")
+        .def("setMask", &TaskCOMEqualityPythonVisitor::setmask, bp::arg("mask"))
         ;
       }
       static std::string name(TaskCOM & self){
@@ -117,6 +115,12 @@ namespace tsid
       }
       static void setKd (TaskCOM & self, const::Eigen::VectorXd Kv){
         return self.Kd(Kv);
+      }
+      static const Eigen::VectorXd & getmask(const TaskCOM & self){
+        return self.getMask();
+      }
+      static void setmask (TaskCOM & self, const Eigen::VectorXd mask){
+        return self.setMask(mask);
       }
       static void expose(const std::string & class_name)
       {

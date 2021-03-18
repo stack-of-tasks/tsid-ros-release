@@ -35,7 +35,7 @@ namespace tsid
       m_Kp.setZero(robot.na());
       m_Kd.setZero(robot.na());
       Vector m = Vector::Ones(robot.na());
-      mask(m);
+      setMask(m);
     }
 
     const Vector & TaskJointPosture::mask() const
@@ -44,6 +44,12 @@ namespace tsid
     }
 
     void TaskJointPosture::mask(const Vector & m)
+    {
+      // std::cerr<<"The method TaskJointPosture::mask is deprecated. Use TaskJointPosture::setMask instead.\n";
+      return setMask(m);
+    }
+
+    void TaskJointPosture::setMask(ConstRefVector m)
     {
       assert(m.size()==m_robot.na());
       m_mask = m;
