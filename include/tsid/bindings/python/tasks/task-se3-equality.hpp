@@ -18,11 +18,7 @@
 #ifndef __tsid_python_task_se3_hpp__
 #define __tsid_python_task_se3_hpp__
 
-#include <pinocchio/fwd.hpp>
-#include <boost/python.hpp>
-#include <string>
-#include <eigenpy/eigenpy.hpp>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
+#include "tsid/bindings/python/fwd.hpp"
 
 #include "tsid/tasks/task-se3-equality.hpp"
 #include "tsid/robots/robot-wrapper.hpp"
@@ -62,6 +58,7 @@ namespace tsid
         .def("setKp", &TaskSE3EqualityPythonVisitor::setKp, bp::arg("Kp"))
         .def("setKd", &TaskSE3EqualityPythonVisitor::setKd, bp::arg("Kd"))
         .def("useLocalFrame", &TaskSE3EqualityPythonVisitor::useLocalFrame, bp::arg("local_frame"))
+        .add_property("mask", bp::make_function(&TaskSE3EqualityPythonVisitor::getMask, bp::return_value_policy<bp::copy_const_reference>()), "Return mask")
         .def("setMask", &TaskSE3EqualityPythonVisitor::setMask, bp::arg("mask"))
         .def("compute", &TaskSE3EqualityPythonVisitor::compute, bp::args("t", "q", "v", "data"))
         .def("getConstraint",  &TaskSE3EqualityPythonVisitor::getConstraint)
@@ -123,6 +120,9 @@ namespace tsid
       }
       static void useLocalFrame (TaskSE3 & self, const bool local_frame) {
         self.useLocalFrame(local_frame);
+      }
+      static void getMask (TaskSE3 & self) {
+        self.getMask();
       }
       static void setMask (TaskSE3 & self, const::Eigen::VectorXd mask) {
         self.setMask(mask);
