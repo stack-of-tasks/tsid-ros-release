@@ -18,11 +18,7 @@
 #ifndef __tsid_python_task_joint_hpp__
 #define __tsid_python_task_joint_hpp__
 
-#include <pinocchio/fwd.hpp>
-#include <boost/python.hpp>
-#include <string>
-#include <eigenpy/eigenpy.hpp>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
+#include "tsid/bindings/python/fwd.hpp"
 
 #include "tsid/tasks/task-joint-posture.hpp"
 #include "tsid/robots/robot-wrapper.hpp"
@@ -50,8 +46,8 @@ namespace tsid
         .add_property("dim", &TaskJoint::dim, "return dimension size")
         .def("setReference", &TaskJointPosturePythonVisitor::setReference, bp::arg("ref"))
         .add_property("getDesiredAcceleration", bp::make_function(&TaskJointPosturePythonVisitor::getDesiredAcceleration, bp::return_value_policy<bp::copy_const_reference>()), "Return Acc_desired")
-        .add_property("mask", bp::make_function(&TaskJointPosturePythonVisitor::getmask, bp::return_value_policy<bp::copy_const_reference>()), "Return Acc_desired")
-        .def("mask", &TaskJointPosturePythonVisitor::setmask, bp::arg("mask"))
+        .add_property("mask", bp::make_function(&TaskJointPosturePythonVisitor::getmask, bp::return_value_policy<bp::copy_const_reference>()), "Return mask")
+        .def("setMask", &TaskJointPosturePythonVisitor::setmask, bp::arg("mask"))
         .def("getAcceleration", &TaskJointPosturePythonVisitor::getAcceleration, bp::arg("dv"))
         .add_property("position_error", bp::make_function(&TaskJointPosturePythonVisitor::position_error, bp::return_value_policy<bp::copy_const_reference>()))
         .add_property("velocity_error", bp::make_function(&TaskJointPosturePythonVisitor::velocity_error, bp::return_value_policy<bp::copy_const_reference>()))
@@ -88,10 +84,10 @@ namespace tsid
         return self.getDesiredAcceleration();
       }
       static const Eigen::VectorXd & getmask(const TaskJoint & self){
-        return self.mask();
+        return self.getMask();
       }
       static void setmask (TaskJoint & self, const Eigen::VectorXd mask){
-        return self.mask(mask);
+        return self.setMask(mask);
       }
       static Eigen::VectorXd getAcceleration (TaskJoint & self, const Eigen::VectorXd dv){
         return self.getAcceleration(dv);
