@@ -18,11 +18,7 @@
 #ifndef __tsid_python_task_actuation_bounds_hpp__
 #define __tsid_python_task_actuation_bounds_hpp__
 
-#include <pinocchio/fwd.hpp>
-#include <boost/python.hpp>
-#include <string>
-#include <eigenpy/eigenpy.hpp>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
+#include "tsid/bindings/python/fwd.hpp"
 
 #include "tsid/tasks/task-actuation-bounds.hpp"
 #include "tsid/robots/robot-wrapper.hpp"
@@ -49,7 +45,7 @@ namespace tsid
         .def(bp::init<std::string, robots::RobotWrapper &> ((bp::arg("name"), bp::arg("robot")), "Default Constructor"))
         .add_property("dim", &Task::dim, "return dimension size")
         .add_property("mask", bp::make_function(&TaskActuationBoundsPythonVisitor::getmask, bp::return_value_policy<bp::copy_const_reference>()), "Return mask")
-        .def("mask", &TaskActuationBoundsPythonVisitor::setmask, bp::arg("mask"))
+        .def("setMask", &TaskActuationBoundsPythonVisitor::setmask, bp::arg("mask"))
         .def("setBounds", &TaskActuationBoundsPythonVisitor::setBounds, bp::args("lower", "upper"))
         .def("compute", &TaskActuationBoundsPythonVisitor::compute, bp::args("t", "q", "v", "data"))
         .def("getConstraint",  &TaskActuationBoundsPythonVisitor::getConstraint)
