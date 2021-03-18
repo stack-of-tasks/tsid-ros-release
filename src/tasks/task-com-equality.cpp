@@ -38,6 +38,7 @@ namespace tsid
       m_p_com.setZero(3);
       m_v_com.setZero(3);
       m_a_des_vec.setZero(3);
+      m_ref.resize(3);
       m_mask.resize(3);
       m_mask.fill(1.);
       setMask(m_mask);      
@@ -58,7 +59,7 @@ namespace tsid
 
     int TaskComEquality::dim() const
     {
-      return m_mask.sum();
+      return int(m_mask.sum());
     }
 
     const Vector3 & TaskComEquality::Kp(){ return m_Kp; }

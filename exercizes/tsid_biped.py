@@ -30,7 +30,7 @@ class TsidBiped:
         formulation = tsid.InverseDynamicsFormulationAccForce("tsid", robot, False)
         formulation.computeProblemData(0.0, q, v)
         data = formulation.data()
-        contact_Point = np.ones((3, 4)) * conf.lz
+        contact_Point = np.ones((3, 4)) * (-conf.lz)
         contact_Point[0, :] = [-conf.lxn, -conf.lxn, conf.lxp, conf.lxp]
         contact_Point[1, :] = [-conf.lyn, conf.lyp, -conf.lyn, conf.lyp]
 
@@ -67,12 +67,23 @@ class TsidBiped:
         comTask = tsid.TaskComEquality("task-com", robot)
         comTask.setKp(conf.kp_com * np.ones(3))
         comTask.setKd(2.0 * np.sqrt(conf.kp_com) * np.ones(3))
-        formulation.addMotionTask(comTask, conf.w_com, 0, 0.0)
+        formulation.addMotionTask(comTask, conf.w_com, 1, 0.0)
+        
+        copTask = tsid.TaskCopEquality("task-cop", robot)
+        formulation.addForceTask(copTask, conf.w_cop, 1, 0.0)
+        
+        amTask = tsid.TaskAMEquality("task-am", robot)
+        amTask.setKp(conf.kp_am * np.array([1., 1., 0.]))
+        amTask.setKd(2.0 * np.sqrt(conf.kp_am * np.array([1., 1., 0.])))
+        formulation.addMotionTask(amTask, conf.w_am, 1, 0.)
+        sampleAM = tsid.TrajectorySample(3)
+        amTask.setReference(sampleAM)
+
 
         postureTask = tsid.TaskJointPosture("task-posture", robot)
         postureTask.setKp(conf.kp_posture * conf.gain_vector)
         postureTask.setKd(2.0 * np.sqrt(conf.kp_posture * conf.gain_vector))
-        postureTask.mask(conf.masks_posture)
+        postureTask.setMask(conf.masks_posture)
         formulation.addMotionTask(postureTask, conf.w_posture, 1, 0.0)
 
         self.leftFootTask = tsid.TaskSE3Equality("task-left-foot", self.robot, self.conf.lf_frame_name)
@@ -123,6 +134,8 @@ class TsidBiped:
         self.solver.resize(formulation.nVar, formulation.nEq, formulation.nIn)
 
         self.comTask = comTask
+        self.copTask = copTask
+        self.amTask = amTask
         self.postureTask = postureTask
         self.contactRF = contactRF
         self.contactLF = contactLF
