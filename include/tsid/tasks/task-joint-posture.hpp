@@ -21,6 +21,7 @@
 #include <tsid/tasks/task-motion.hpp>
 #include <tsid/trajectories/trajectory-base.hpp>
 #include <tsid/math/constraint-equality.hpp>
+#include <tsid/deprecation.hpp>
 
 namespace tsid
 {
@@ -57,8 +58,9 @@ namespace tsid
       const Vector & getDesiredAcceleration() const;
       Vector getAcceleration(ConstRefVector dv) const;
 
-      const Vector & mask() const;
-      void mask(const Vector & mask);
+      DEPRECATED const Vector & mask() const; // deprecated
+      DEPRECATED void mask(const Vector & mask); // deprecated
+      virtual void setMask(math::ConstRefVector mask);
 
       const Vector & position_error() const;
       const Vector & velocity_error() const;
@@ -78,7 +80,6 @@ namespace tsid
       Vector m_p_error, m_v_error;
       Vector m_p, m_v;
       Vector m_a_des;
-      Vector m_mask;
       VectorXi m_activeAxes;
       TrajectorySample m_ref;
       ConstraintEquality m_constraint;
