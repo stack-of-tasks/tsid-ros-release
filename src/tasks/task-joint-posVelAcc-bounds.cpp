@@ -103,7 +103,7 @@ namespace tsid
       m_dqa = Vector::Zero(m_na);
 
       Vector m = Vector::Ones(robot.na());
-      mask(m);
+      setMask(m);
 
       for(int i=0; i<m_na; i++)
       {
@@ -118,6 +118,12 @@ namespace tsid
     }
 
     void TaskJointPosVelAccBounds::mask(const Vector & m)
+    {
+      // std::cerr<<"The method TaskJointPosVelAccBounds::mask is deprecated. Use TaskJointPosVelAccBounds::setMask instead.\n";
+      return setMask(m);
+    }
+
+    void TaskJointPosVelAccBounds::setMask(ConstRefVector m)
     {
       assert(m.size()==m_robot.na());
       m_mask = m;

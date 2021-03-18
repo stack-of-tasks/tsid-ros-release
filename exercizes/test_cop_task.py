@@ -1,3 +1,12 @@
+''' This script is a slight variation of ex_4_walking.py introduced to test the new
+    center of pressure (CoP) task. In this script, besides tracking a reference
+    center of mass (CoM), the TSID controller also tries to track a reference CoP.
+    The resulting motion doesn't look great because the reference CoP is an open-loop
+    reference trajectory, so it is not stabilizing, and it conflicts with the CoM task.
+    However, the results show that the CoP is tracked reasonably well during the motion,
+    which was the goal of the test, validating the CoP task.
+'''
+
 import numpy as np
 from numpy import nan
 from numpy.linalg import norm as norm
@@ -12,7 +21,7 @@ print("".center(conf.LINE_WIDTH,'#'))
 print(" Test Walking ".center(conf.LINE_WIDTH, '#'))
 print("".center(conf.LINE_WIDTH,'#'), '\n')
 
-PLOT_COM = 1
+PLOT_COM = 0
 PLOT_COP = 1
 PLOT_FOOT_TRAJ = 0
 PLOT_TORQUES = 0
@@ -41,6 +50,7 @@ f_RF = np.zeros((6, N+N_post))
 f_LF = np.zeros((6, N+N_post))
 cop_RF = np.zeros((2, N+N_post))
 cop_LF = np.zeros((2, N+N_post))
+cop    = np.zeros((2, N+N_post))
 tau    = np.zeros((tsid.robot.na, N+N_post))
 q_log  = np.zeros((tsid.robot.nq, N+N_post))
 v_log  = np.zeros((tsid.robot.nv, N+N_post))
@@ -62,8 +72,11 @@ x_rf   = tsid.get_placement_RF().translation
 offset = x_rf - x_RF_ref[:,0]
 for i in range(N):
     com_pos_ref[:,i] += offset + np.array([0.,0.,0.0])
+    cop_ref[:,i]  += offset[:2]
     x_RF_ref[:,i] += offset
     x_LF_ref[:,i] += offset
+# remove nan from cop_ref
+cop_ref[:,-1] = cop_ref[:,-2]
 
 t = -conf.T_pre
 q, v = tsid.q, tsid.v
@@ -74,6 +87,8 @@ for i in range(-N_pre, N+N_post):
     if i==0:
         print("Starting to walk (remove contact left foot)")
         tsid.remove_contact_LF()
+        # activate CoP task only when robot starts walking
+        tsid.formulation.updateTaskWeight(tsid.copTask.name, 1e-4)
     elif i>0 and i<N-1:
         if contact_phase[i] != contact_phase[i-1]:
             print("Time %.3f Changing contact phase from %s to %s"%(t, contact_phase[i-1], contact_phase[i]))
@@ -83,7 +98,12 @@ for i in range(-N_pre, N+N_post):
             else:
                 tsid.add_contact_RF()
                 tsid.remove_contact_LF()
-    
+    elif i==N:
+        # switch to double support at the end
+        if contact_phase[i-1] == 'left':
+            tsid.add_contact_RF()
+        else:
+            tsid.add_contact_LF()
     
     if i<0:
         tsid.set_com_ref(com_pos_ref[:,0], 0*com_vel_ref[:,0], 0*com_acc_ref[:,0])
@@ -91,6 +111,7 @@ for i in range(-N_pre, N+N_post):
         tsid.set_com_ref(com_pos_ref[:,i], com_vel_ref[:,i], com_acc_ref[:,i])
         tsid.set_LF_3d_ref(x_LF_ref[:,i], dx_LF_ref[:,i], ddx_LF_ref[:,i])
         tsid.set_RF_3d_ref(x_RF_ref[:,i], dx_RF_ref[:,i], ddx_RF_ref[:,i])
+        tsid.copTask.setReference(np.concatenate([cop_ref[:,i], np.zeros(1)]))
     
     HQPData = tsid.formulation.computeProblemData(t, q, v)
 
@@ -132,6 +153,9 @@ for i in range(-N_pre, N+N_post):
             if(f_LF[2,i]>1e-3): 
                 cop_LF[0,i] = f_LF[4,i] / f_LF[2,i]
                 cop_LF[1,i] = -f_LF[3,i] / f_LF[2,i]
+        cop_LF_world = tsid.get_placement_LF().act(np.array([cop_LF[0,i], cop_LF[1,i], 0]))
+        cop_RF_world = tsid.get_placement_RF().act(np.array([cop_RF[0,i], cop_RF[1,i], 0]))
+        cop[:,i] = (cop_LF_world[:2]*f_LF[2,i] + cop_RF_world[:2]*f_RF[2,i]) / (f_LF[2,i]+f_RF[2,i])
 
     if i%conf.PRINT_N == 0:
         print("Time %.3f"%(t))
@@ -189,7 +213,6 @@ if PLOT_COP:
     for i in range(2):
         ax[i].plot(time, cop_LF[i,:], label='CoP LF '+str(i))
         ax[i].plot(time, cop_RF[i,:], label='CoP RF '+str(i))
-#        ax[i].plot(time[:N], cop_ref[i,:], label='CoP ref '+str(i))
         if i==0:   
             ax[i].plot([time[0], time[-1]], [-conf.lxn, -conf.lxn], ':', label='CoP Lim '+str(i))
             ax[i].plot([time[0], time[-1]], [conf.lxp, conf.lxp], ':', label='CoP Lim '+str(i))
@@ -197,7 +220,16 @@ if PLOT_COP:
             ax[i].plot([time[0], time[-1]], [-conf.lyn, -conf.lyn], ':', label='CoP Lim '+str(i))
             ax[i].plot([time[0], time[-1]], [conf.lyp, conf.lyp], ':', label='CoP Lim '+str(i))
         ax[i].set_xlabel('Time [s]')
-        ax[i].set_ylabel('CoP [m]')
+        ax[i].set_ylabel('CoP (local) [m]')
+        leg = ax[i].legend()
+        leg.get_frame().set_alpha(0.5)
+        
+    (f, ax) = plut.create_empty_figure(2,1)
+    for i in range(2):
+        ax[i].plot(time[:N], cop_ref[i,:], label='CoP ref '+str(i))
+        ax[i].plot(time, cop[i,:], label='CoP '+str(i))
+        ax[i].set_xlabel('Time [s]')
+        ax[i].set_ylabel('CoP (world) [m]')
         leg = ax[i].legend()
         leg.get_frame().set_alpha(0.5)
     
