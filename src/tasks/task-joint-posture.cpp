@@ -17,6 +17,7 @@
 
 #include <tsid/tasks/task-joint-posture.hpp>
 #include "tsid/robots/robot-wrapper.hpp"
+#include <pinocchio/algorithm/joint-configuration.hpp>
 
 namespace tsid
 {
@@ -29,9 +30,10 @@ namespace tsid
     TaskJointPosture::TaskJointPosture(const std::string & name,
                                      RobotWrapper & robot):
       TaskMotion(name, robot),
-      m_ref(robot.na()),
+      m_ref(robot.nq_actuated(), robot.na()),
       m_constraint(name, robot.na(), robot.nv())
     {
+      m_ref_q_augmented = pinocchio::neutral(robot.model());
       m_Kp.setZero(robot.na());
       m_Kd.setZero(robot.na());
       Vector m = Vector::Ones(robot.na());
@@ -92,9 +94,9 @@ namespace tsid
 
     void TaskJointPosture::setReference(const TrajectorySample & ref)
     {
-      assert(ref.pos.size()==m_robot.na());
-      assert(ref.vel.size()==m_robot.na());
-      assert(ref.acc.size()==m_robot.na());
+      assert(ref.getValue().size()==m_robot.nq_actuated());
+      assert(ref.getDerivative().size()==m_robot.na());
+      assert(ref.getSecondDerivative().size()==m_robot.na());
       m_ref = ref;
     }
 
@@ -135,12 +137,12 @@ namespace tsid
 
     const Vector & TaskJointPosture::position_ref() const
     {
-      return m_ref.pos;
+      return m_ref.getValue();
     }
 
     const Vector & TaskJointPosture::velocity_ref() const
     {
-      return m_ref.vel;
+      return m_ref.getDerivative();
     }
 
     const ConstraintBase & TaskJointPosture::getConstraint() const
@@ -153,19 +155,21 @@ namespace tsid
                                                     ConstRefVector v,
                                                     Data & )
     {
+      m_ref_q_augmented.tail(m_robot.nq_actuated()) = m_ref.getValue();
+
       // Compute errors
-      m_p = q.tail(m_robot.na());
+      m_p_error = pinocchio::difference(m_robot.model(), m_ref_q_augmented, q).tail(m_robot.na());
+
       m_v = v.tail(m_robot.na());
-      m_p_error = m_p - m_ref.pos;
-      m_v_error = m_v - m_ref.vel;
+      m_v_error = m_v - m_ref.getDerivative();
       m_a_des = - m_Kp.cwiseProduct(m_p_error)
                 - m_Kd.cwiseProduct(m_v_error)
-                + m_ref.acc;
+                + m_ref.getSecondDerivative();
 
       for(unsigned int i=0; i<m_activeAxes.size(); i++)
         m_constraint.vector()(i) = m_a_des(m_activeAxes(i));
       return m_constraint;
     }
-    
+
   }
 }
