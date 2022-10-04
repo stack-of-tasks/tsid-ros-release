@@ -73,6 +73,7 @@ check_minimal_cxx_standard(11 ENFORCE)
 
 # Project dependencies
 if(BUILD_PYTHON_INTERFACE)
+  set(PYTHON_EXECUTABLE "/usr/bin/python3")
   set(PYWRAP ${PROJECT_NAME}_pywrap)
   add_project_dependency(eigenpy 2.7.12 REQUIRED)
 endif(BUILD_PYTHON_INTERFACE)
