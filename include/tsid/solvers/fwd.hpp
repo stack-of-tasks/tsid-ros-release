@@ -20,7 +20,7 @@
 
 #include <memory>
 
-#include "tsid/config.hpp"
+#include "tsid/config.hh"
 #include "tsid/math/fwd.hpp"
 #include <pinocchio/container/aligned-vector.hpp>
 
@@ -39,8 +39,11 @@ namespace tsid
       SOLVER_HQP_EIQUADPROG = 0,
       SOLVER_HQP_EIQUADPROG_FAST = 1,
       SOLVER_HQP_EIQUADPROG_RT = 2
+#ifdef TSID_QPMAD_FOUND
+      ,SOLVER_HQP_QPMAD
+#endif
 #ifdef QPOASES_FOUND
-      ,SOLVER_HQP_OASES = 3
+      ,SOLVER_HQP_OASES
 #endif
     };
     

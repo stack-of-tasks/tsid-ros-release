@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2019 University of Trento
+// Copyright (c) 2021 LAAS-CNRS, University of Trento
 //
 // This file is part of tsid
 // tsid is free software: you can redistribute it
@@ -15,16 +15,16 @@
 // <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _tsid_lib_deprecation_hpp
-#define _tsid_lib_deprecation_hpp
+#include "tsid/bindings/python/tasks/task-contact-force-equality.hpp"
+#include "tsid/bindings/python/tasks/expose-tasks.hpp"
 
-#if defined(__GNUC__) || defined(__clang__)
-#define DEPRECATED __attribute__((deprecated))
-#elif defined(_MSC_VER)
-#define DEPRECATED __declspec(deprecated)
-#else
-#pragma message("WARNING: You need to implement DEPRECATED for this compiler")
-#define DEPRECATED
-#endif
-
-#endif //_tsid_lib_deprecation_hpp
+namespace tsid
+{
+  namespace python
+  {
+    void exposeTaskContactForceEquality()
+    {
+      TaskContactForceEqualityPythonVisitor<tsid::tasks::TaskContactForceEquality>::expose("TaskContactForceEquality");
+    }
+  }
+}
