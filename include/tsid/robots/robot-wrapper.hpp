@@ -18,6 +18,7 @@
 #ifndef __invdyn_robot_wrapper_hpp__
 #define __invdyn_robot_wrapper_hpp__
 
+#include "tsid/deprecated.hh"
 #include "tsid/math/fwd.hpp"
 #include "tsid/robots/fwd.hpp"
 
@@ -54,22 +55,35 @@ namespace tsid
       typedef math::Matrix3x Matrix3x;
       typedef math::RefVector RefVector;
       typedef math::ConstRefVector ConstRefVector;
-      
-      
-      RobotWrapper(const std::string & filename,
-                   const std::vector<std::string> & package_dirs,
-                   bool verbose=false);
 
-      RobotWrapper(const Model & m, bool verbose=false);
+      /* Possible root joints */
+      typedef enum e_RootJointType
+      {
+        FIXED_BASE_SYSTEM=0,
+        FLOATING_BASE_SYSTEM=1,
+      } RootJointType;
 
       RobotWrapper(const std::string & filename,
-                   const std::vector<std::string> & package_dirs,
-                   const pinocchio::JointModelVariant & rootJoint,
+                                   const std::vector<std::string> & package_dirs,
+                                   bool verbose=false);
+
+      RobotWrapper(const std::string & filename,
+                                   const std::vector<std::string> & package_dirs,
+                                   const pinocchio::JointModelVariant & rootJoint,
+                                   bool verbose=false);
+
+      TSID_DEPRECATED RobotWrapper(const Model & m,
+                                   bool verbose=false);
+
+      RobotWrapper(const Model & m,
+                   RootJointType rootJoint,
                    bool verbose=false);
       
       virtual int nq() const;
+      virtual int nq_actuated() const;
       virtual int nv() const;
       virtual int na() const;
+      virtual bool is_fixed_base() const;
       
       ///
       /// \brief Accessor to model.
@@ -184,7 +198,9 @@ namespace tsid
       std::string m_model_filename;
       bool m_verbose;
       
+      int m_nq_actuated;     /// dimension of the configuration space of the actuated DoF (nq for fixed-based, nq-7 for floating-base robots)
       int m_na;     /// number of actuators (nv for fixed-based, nv-6 for floating-base robots)
+      bool m_is_fixed_base;
       Vector m_rotor_inertias;
       Vector m_gear_ratios;
       Vector m_Md;  /// diagonal part of inertia matrix due to rotor inertias
