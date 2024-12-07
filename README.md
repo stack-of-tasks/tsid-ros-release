@@ -1,3 +1,26 @@
+## tsid (noetic) - 1.7.1-1
+
+The packages in the `tsid` repository were released into the `noetic` distro by running `/nix/store/ai12rs6v9d4pfsj8m2k668zbnr7z8l57-python3.12-bloom-0.12.0/bin/bloom-release -r noetic tsid` on `Sat, 07 Dec 2024 11:03:58 -0000`
+
+The `tsid` package was released.
+
+Version of package(s) in repository `tsid`:
+
+- upstream repository: https://github.com/stack-of-tasks/tsid.git
+- release repository: https://github.com/stack-of-tasks/tsid-ros-release.git
+- rosdistro version: `1.6.2-2`
+- old version: `1.6.2-2`
+- new version: `1.7.1-1`
+
+Versions of tools used:
+
+- bloom version: `0.12.0`
+- catkin_pkg version: `1.0.0`
+- rosdep version: `0.25.1`
+- rosdistro version: `0.9.1`
+- vcstools version: `0.1.42`
+
+
 ## tsid (noetic) - 1.6.2-2
 
 The packages in the `tsid` repository were released into the `noetic` distro by running `/usr/bin/bloom-release tsid --rosdistro noetic` on `Tue, 04 Oct 2022 08:46:23 -0000`
